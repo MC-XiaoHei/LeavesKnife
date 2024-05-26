@@ -1,9 +1,9 @@
-package com.github.mcxiaohei.leavesknife.services
+package cn.xor7.xiaohei.leavesknife.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.github.mcxiaohei.leavesknife.MyBundle
+import cn.xor7.xiaohei.leavesknife.MyBundle
 
 @Service(Service.Level.PROJECT)
 class MyProjectService(project: Project) {

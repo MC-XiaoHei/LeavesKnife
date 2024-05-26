@@ -1,4 +1,4 @@
-package com.github.mcxiaohei.leavesknife
+package cn.xor7.xiaohei.leavesknife
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls

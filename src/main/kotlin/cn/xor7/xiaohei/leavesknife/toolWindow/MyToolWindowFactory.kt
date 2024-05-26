@@ -1,4 +1,4 @@
-package com.github.mcxiaohei.leavesknife.toolWindow
+package cn.xor7.xiaohei.leavesknife.toolWindow
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -8,8 +8,8 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.content.ContentFactory
-import com.github.mcxiaohei.leavesknife.MyBundle
-import com.github.mcxiaohei.leavesknife.services.MyProjectService
+import cn.xor7.xiaohei.leavesknife.MyBundle
+import cn.xor7.xiaohei.leavesknife.services.MyProjectService
 import javax.swing.JButton
 
 

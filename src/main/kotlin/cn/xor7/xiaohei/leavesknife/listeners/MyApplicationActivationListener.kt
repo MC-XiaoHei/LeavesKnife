@@ -1,4 +1,4 @@
-package com.github.mcxiaohei.leavesknife.listeners
+package cn.xor7.xiaohei.leavesknife.listeners
 
 import com.intellij.openapi.application.ApplicationActivationListener
 import com.intellij.openapi.diagnostic.thisLogger

@@ -1,18 +1,25 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.mcxiaohei.leavesknife</id>
+    <id>cn.xor7.xiaohei.leavesknife</id>
     <name>LeavesKnife</name>
     <vendor>mc-xiaohei</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.mcxiaohei.leavesknife.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <postStartupActivity implementation="cn.xor7.xiaohei.leavesknife.activities.ProjectStartupActivity"/>
+        <toolWindow factoryClass="cn.xor7.xiaohei.leavesknife.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
+        <taskManager implementation="cn.xor7.xiaohei.leavesknife.services.GradleTaskManager"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.mcxiaohei.leavesknife.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
+        <listener class="cn.xor7.xiaohei.leavesknife.listeners.MyApplicationActivationListener"
+                  topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 </idea-plugin>
