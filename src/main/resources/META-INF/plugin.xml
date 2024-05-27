@@ -12,6 +12,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="cn.xor7.xiaohei.leavesknife.activities.ProjectStartupActivity"/>
         <toolWindow factoryClass="cn.xor7.xiaohei.leavesknife.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="cn.xor7.xiaohei.leavesknife.toolWindow.ApplyServerPatchesToolWindowFactory" id="ApplyServerPatchesToolWindow"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
