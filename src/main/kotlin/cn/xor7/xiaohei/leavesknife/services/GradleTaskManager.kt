@@ -18,7 +18,5 @@ class GradleTaskManager : GradleTaskManagerExtension {
         return super.executeTasks(id, taskNames, projectPath, settings, jvmParametersSetup, listener)
     }
 
-    override fun cancelTask(id: ExternalSystemTaskId, listener: ExternalSystemTaskNotificationListener): Boolean {
-        return false
-    }
+    override fun cancelTask(id: ExternalSystemTaskId, listener: ExternalSystemTaskNotificationListener): Boolean = false
 }
