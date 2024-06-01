@@ -11,11 +11,15 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="cn.xor7.xiaohei.leavesknife.activities.ProjectStartupActivity"/>
-        <toolWindow factoryClass="cn.xor7.xiaohei.leavesknife.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <toolWindow factoryClass="cn.xor7.xiaohei.leavesknife.toolWindow.ApplyServerPatchesToolWindowFactory" id="ApplyServerPatchesToolWindow"/>
+        <toolWindow factoryClass="cn.xor7.xiaohei.leavesknife.toolWindow.PatchesToolWindowFactory"
+                    id="Patches"
+                    anchor="right"
+                    icon="AllIcons.Vcs.Patch"
+        />
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
+        <projectResolve implementation="cn.xor7.xiaohei.leavesknife.services.GradleProjectResolver"/>
         <taskManager implementation="cn.xor7.xiaohei.leavesknife.services.GradleTaskManager"/>
     </extensions>
 
