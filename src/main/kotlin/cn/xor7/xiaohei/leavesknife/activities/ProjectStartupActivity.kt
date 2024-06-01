@@ -15,8 +15,7 @@ class ProjectStartupActivity : ProjectActivity {
             .connect().use { connection ->
                 val ideaProject: IdeaProject = connection.getModel(IdeaProject::class.java)
                 project.leavesknifeConfigService.enablePlugin =
-                    ideaProject.modules
-                        .filter { it.name == "paper-api-generator" }.isNotEmpty()
+                    ideaProject.modules.any { it.name == "paper-api-generator" }
             }
     }
 }
