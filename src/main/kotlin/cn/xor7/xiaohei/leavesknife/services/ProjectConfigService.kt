@@ -23,3 +23,6 @@ class ProjectConfigService(project: Project) {
         }
     }
 }
+
+val Project.leavesknifeConfigService: ProjectConfigService
+    get() = this.getService(ProjectConfigService::class.java)

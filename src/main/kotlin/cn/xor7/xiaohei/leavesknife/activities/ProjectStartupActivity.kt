@@ -1,5 +1,7 @@
 package cn.xor7.xiaohei.leavesknife.activities
 
+import cn.xor7.xiaohei.leavesknife.services.ProjectConfigService
+import cn.xor7.xiaohei.leavesknife.services.leavesknifeConfigService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import org.gradle.tooling.GradleConnector
@@ -9,18 +11,14 @@ import java.io.File
 
 class ProjectStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
-        println("Project opened.")
         val projectDir = project.basePath ?: return
         GradleConnector.newConnector()
             .forProjectDirectory(File(projectDir))
             .connect().use { connection ->
                 val ideaProject: IdeaProject = connection.getModel(IdeaProject::class.java)
-                for (module in ideaProject.modules) {
-                    println("Module: ${module.name}")
-                    for (dependency in module.dependencies) {
-                        println("  Dependency: ${dependency}")
-                    }
-                }
+                project.leavesknifeConfigService.enablePlugin =
+                    ideaProject.modules
+                        .filter { it.name == "paper-api-generator" }.isNotEmpty()
             }
     }
 }
