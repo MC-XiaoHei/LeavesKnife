@@ -26,7 +26,7 @@ class PatchesToolWindowFactory : ToolWindowFactory {
 
     class ServerPatchesToolWindow(toolWindow: ToolWindow) {
 
-        private val service = toolWindow.project.service<ProjectConfigS ervice>()
+        private val service = toolWindow.project.service<ProjectConfigService>()
 
         fun getContent() = JBPanel<JBPanel<*>>().apply {
         }
