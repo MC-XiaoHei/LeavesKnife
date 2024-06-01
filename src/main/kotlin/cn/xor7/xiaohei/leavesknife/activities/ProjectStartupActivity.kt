@@ -1,11 +1,9 @@
 package cn.xor7.xiaohei.leavesknife.activities
 
-import cn.xor7.xiaohei.leavesknife.services.ProjectConfigService
 import cn.xor7.xiaohei.leavesknife.services.leavesknifeConfigService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import org.gradle.tooling.GradleConnector
-import org.gradle.tooling.ProjectConnection
 import org.gradle.tooling.model.idea.IdeaProject
 import java.io.File
 
