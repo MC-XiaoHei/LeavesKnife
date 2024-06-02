@@ -12,7 +12,6 @@ class ProjectConfigService(private val project: Project) {
     var enablePlugin = false
         set(value) {
             field = value
-            println("enablePlugin: $value")
             runInEdt {
                 ToolWindowManager
                     .getInstance(project)
