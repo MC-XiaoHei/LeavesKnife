@@ -1,5 +1,11 @@
 package cn.xor7.xiaohei.leavesknife.services
 
+import cn.xor7.xiaohei.leavesknife.CommonBundle
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
@@ -17,6 +23,29 @@ class ProjectConfigService(private val project: Project) {
                     .getInstance(project)
                     .getToolWindow("Patches")
                     ?.isAvailable = value
+            }
+        }
+    var needConfigure = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value) {
+                @Suppress("DialogTitleCapitalization")
+                NotificationGroupManager.getInstance()
+                    .getNotificationGroup("LeavesKnife")
+                    .createNotification(
+                        CommonBundle.message("notification.configure.title"),
+                        NotificationType.INFORMATION
+                    )
+                    .addAction(object : NotificationAction(
+                        CommonBundle.message("notification.configure.action")
+                    ) {
+                        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+                            project.leavesknifeConfigService.enablePlugin = true
+                            notification.hideBalloon()
+                        }
+                    })
+                    .notify(project)
             }
         }
 }

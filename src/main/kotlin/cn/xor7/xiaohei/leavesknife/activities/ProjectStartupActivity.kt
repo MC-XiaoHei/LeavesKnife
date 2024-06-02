@@ -1,13 +1,7 @@
 package cn.xor7.xiaohei.leavesknife.activities
 
-import cn.xor7.xiaohei.leavesknife.CommonBundle
 import cn.xor7.xiaohei.leavesknife.services.LEAVESKNIFE_CONFIG_FILE
 import cn.xor7.xiaohei.leavesknife.services.leavesknifeConfigService
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationAction
-import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationType
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.startup.ProjectActivity
@@ -28,6 +22,7 @@ class ProjectStartupActivity : ProjectActivity {
                 )
             ) {
                 project.leavesknifeConfigService.enablePlugin = true
+                // TODO 检查配置文件合法性
                 return@let
             }
             GradleConnector.newConnector()
@@ -35,22 +30,7 @@ class ProjectStartupActivity : ProjectActivity {
                 .connect().use { connection ->
                     val ideaProject: IdeaProject = connection.getModel(IdeaProject::class.java)
                     if (ideaProject.modules.any { it.name == "paper-api-generator" }) {
-                        @Suppress("DialogTitleCapitalization")
-                        NotificationGroupManager.getInstance()
-                            .getNotificationGroup("LeavesKnife")
-                            .createNotification(
-                                CommonBundle.message("notification.configure.title"),
-                                NotificationType.INFORMATION
-                            )
-                            .addAction(object : NotificationAction(
-                                CommonBundle.message("notification.configure.action")
-                            ) {
-                                override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-                                    project.leavesknifeConfigService.enablePlugin = true
-                                    notification.hideBalloon()
-                                }
-                            })
-                            .notify(project)
+                        project.leavesknifeConfigService.needConfigure = true
                         return@let
                     }
                 }
