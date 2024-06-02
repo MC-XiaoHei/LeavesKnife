@@ -21,7 +21,6 @@ class ProjectStartupActivity : ProjectActivity {
                     )
                 )
             ) {
-                project.leavesknifeConfigService.enablePlugin = true
                 // TODO 检查配置文件合法性
                 return@let
             }

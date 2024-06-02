@@ -41,7 +41,7 @@ class ProjectConfigService(private val project: Project) {
                         CommonBundle.message("notification.configure.action")
                     ) {
                         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-                            project.leavesknifeConfigService.enablePlugin = true
+                            // TODO 打开配置窗口
                             notification.hideBalloon()
                         }
                     })
