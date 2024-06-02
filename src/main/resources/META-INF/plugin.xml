@@ -17,7 +17,6 @@
         />
         <notificationGroup id="LeavesKnife"
                            displayType="STICKY_BALLOON"
-                           key="notification.group.name"
         />
     </extensions>
 
