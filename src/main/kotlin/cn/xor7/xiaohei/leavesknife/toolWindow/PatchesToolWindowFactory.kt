@@ -1,6 +1,6 @@
 package cn.xor7.xiaohei.leavesknife.toolWindow
 
-import cn.xor7.xiaohei.leavesknife.services.ProjectConfigService
+import cn.xor7.xiaohei.leavesknife.services.ProjectStoreService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -24,7 +24,7 @@ class PatchesToolWindowFactory : ToolWindowFactory {
     override fun shouldBeAvailable(project: Project) = false
 
     class ServerPatchesToolWindow(toolWindow: ToolWindow) {
-        private val service = toolWindow.project.service<ProjectConfigService>()
+        private val service = toolWindow.project.service<ProjectStoreService>()
 
         fun getContent() = JBPanel<JBPanel<*>>().apply {
 

@@ -14,7 +14,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 const val LEAVESKNIFE_CONFIG_FILE = "leavesknife.properties"
 
 @Service(Service.Level.PROJECT)
-class ProjectConfigService(private val project: Project) {
+class ProjectStoreService(private val project: Project) {
     var enablePlugin = false
         set(value) {
             field = value
@@ -27,6 +27,7 @@ class ProjectConfigService(private val project: Project) {
         }
     var needConfigure = false
         set(value) {
+            if (value) enablePlugin = false
             if (field == value) return
             field = value
             if (value) {
@@ -37,9 +38,7 @@ class ProjectConfigService(private val project: Project) {
                         CommonBundle.message("notification.configure.title"),
                         NotificationType.INFORMATION
                     )
-                    .addAction(object : NotificationAction(
-                        CommonBundle.message("notification.configure.action")
-                    ) {
+                    .addAction(object : NotificationAction(CommonBundle.message("notification.configure.action")) {
                         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
                             // TODO 打开配置窗口
                             notification.hideBalloon()
@@ -48,7 +47,8 @@ class ProjectConfigService(private val project: Project) {
                     .notify(project)
             }
         }
+    var modulePaths: MutableMap<String, String> = mutableMapOf()
 }
 
-val Project.leavesknifeConfigService: ProjectConfigService
-    get() = this.getService(ProjectConfigService::class.java)
+val Project.leavesknifeStoreService: ProjectStoreService
+    get() = this.getService(ProjectStoreService::class.java)
