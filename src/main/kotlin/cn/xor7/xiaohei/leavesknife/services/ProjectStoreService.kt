@@ -1,6 +1,7 @@
 package cn.xor7.xiaohei.leavesknife.services
 
 import cn.xor7.xiaohei.leavesknife.CommonBundle
+import cn.xor7.xiaohei.leavesknife.dialogs.PluginConfigurationDialog
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
@@ -9,7 +10,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.wm.ToolWindowManager
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.*
 
 const val LEAVESKNIFE_CONFIG_FILE = "leavesknife.properties"
 
@@ -40,15 +45,24 @@ class ProjectStoreService(private val project: Project) {
                     )
                     .addAction(object : NotificationAction(CommonBundle.message("notification.configure.action")) {
                         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-                            // TODO 打开配置窗口
                             notification.hideBalloon()
+                            PluginConfigurationDialog(project).show()
                         }
                     })
                     .notify(project)
             }
         }
     var modulePaths: MutableMap<String, String> = mutableMapOf()
+    val patchesInfo: MutableMap<PatchType, PatchesInfo> = mutableMapOf()
+    val properties = Properties()
+    val configPath: Path = Paths.get(project.guessProjectDir()?.path ?: ".", LEAVESKNIFE_CONFIG_FILE)
 }
 
 val Project.leavesknifeStoreService: ProjectStoreService
     get() = this.getService(ProjectStoreService::class.java)
+
+data class PatchesInfo(var moduleName: String, var base: String)
+
+enum class PatchType {
+    SERVER, API, GENERATED_API
+}
