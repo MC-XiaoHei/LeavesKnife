@@ -13,7 +13,6 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.*
 import org.jetbrains.annotations.Nullable
-import java.io.FileInputStream
 import java.util.*
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComponent
@@ -21,7 +20,7 @@ import javax.swing.JComponent
 
 class PluginConfigurationDialog(private val project: Project) : DialogWrapper(true) {
     private val store = project.leavesknifeStoreService
-    private val baseTextFields = mutableMapOf<PatchType, Cell<TextFieldWithBrowseButton>>()
+    private val pathTextFields = mutableMapOf<PatchType, Cell<TextFieldWithBrowseButton>>()
     private val moduleComboBoxes = mutableMapOf<PatchType, Cell<ComboBox<String>>>()
 
     init {
@@ -39,27 +38,27 @@ class PluginConfigurationDialog(private val project: Project) : DialogWrapper(tr
 
     @Suppress("DialogTitleCapitalization")
     private fun Panel.createPatchGroup(patchType: PatchType, name: String) {
+        if (!store.patchesInfo.containsKey(patchType)) {
+            store.patchesInfo[patchType] = PatchesInfo(getFallbackOption(patchType), "", "")
+        }
         group("$name Patches") {
             row(CommonBundle.message("dialog.configure.common.module")) {
-                val comboBoxModel = DefaultComboBoxModel(store.modulePaths.keys.toTypedArray())
-                moduleComboBoxes[patchType] = comboBox(comboBoxModel).bindItem(
-                    getter = {
-                        if (!store.patchesInfo.containsKey(patchType)) {
-                            store.patchesInfo[patchType] = PatchesInfo(getFallbackOption(patchType), "")
+                moduleComboBoxes[patchType] =
+                    comboBox(DefaultComboBoxModel(store.modulePaths.keys.toTypedArray())).bindItem(
+                        getter = {
+                            store.patchesInfo[patchType]?.module ?: getFallbackOption(patchType)
+                        },
+                        setter = {
+                            store.patchesInfo[patchType]?.module = it ?: getFallbackOption(patchType)
                         }
-                        store.patchesInfo[patchType]?.moduleName ?: getFallbackOption(patchType)
-                    },
-                    setter = {
-                        store.patchesInfo[patchType]?.moduleName = it ?: getFallbackOption(patchType)
+                    ).validationOnInput { component ->
+                        validateModule(patchType, component)
+                    }.validationOnApply { component ->
+                        validateModule(patchType, component)
                     }
-                ).validationOnInput { component ->
-                    validateModule(patchType, component)
-                }.validationOnApply { component ->
-                    validateModule(patchType, component)
-                }
             }
-            row(CommonBundle.message("dialog.configure.common.base")) {
-                baseTextFields[patchType] = textFieldWithBrowseButton(
+            row(CommonBundle.message("dialog.configure.common.path")) {
+                pathTextFields[patchType] = textFieldWithBrowseButton(
                     browseDialogTitle = CommonBundle.message(
                         "dialog.configure.${patchType.name.lowercase(Locale.getDefault())}.browse.title"
                     ),
@@ -68,29 +67,29 @@ class PluginConfigurationDialog(private val project: Project) : DialogWrapper(tr
                     fileChosen = { chosenFile -> chosenFile.path }
                 ).bindText(
                     getter = {
-                        store.patchesInfo[patchType]?.base ?: ""
+                        store.patchesInfo[patchType]?.path ?: ""
                     },
                     setter = {
-                        store.patchesInfo[patchType]?.base = it
+                        store.patchesInfo[patchType]?.path = it
                     }
                 ).validationOnInput { component ->
-                    if (component.text.isEmpty()) error(CommonBundle.message("dialog.configure.common.base.error.empty"))
+                    if (component.text.isEmpty()) error(CommonBundle.message("dialog.configure.common.path.error.empty"))
                     else when (patchType) {
                         PatchType.SERVER -> null
                         PatchType.API ->
-                            if (component.text == baseTextFields[PatchType.SERVER]?.component?.text) {
-                                error(CommonBundle.message("dialog.configure.common.base.error.same"))
+                            if (component.text == pathTextFields[PatchType.SERVER]?.component?.text) {
+                                error(CommonBundle.message("dialog.configure.common.path.error.same"))
                             } else null
 
                         PatchType.GENERATED_API ->
-                            if (component.text == baseTextFields[PatchType.SERVER]?.component?.text ||
-                                component.text == baseTextFields[PatchType.API]?.component?.text
+                            if (component.text == pathTextFields[PatchType.SERVER]?.component?.text ||
+                                component.text == pathTextFields[PatchType.API]?.component?.text
                             ) {
-                                error(CommonBundle.message("dialog.configure.common.base.error.same"))
+                                error(CommonBundle.message("dialog.configure.common.path.error.same"))
                             } else null
                     }
                 }.validationOnApply {
-                    if (it.text.isEmpty()) error(CommonBundle.message("dialog.configure.common.base.error.empty"))
+                    if (it.text.isEmpty()) error(CommonBundle.message("dialog.configure.common.path.error.empty"))
                     else null
                 }
             }
@@ -104,27 +103,27 @@ class PluginConfigurationDialog(private val project: Project) : DialogWrapper(tr
             needConfigure = false
             val configFile = configPath.toFile()
             if (!configFile.exists()) configFile.createNewFile()
-            FileInputStream(configFile).use { fileInputStream ->
-                with(properties) {
-                    load(fileInputStream)
-                    val serverPatchesInfo = patchesInfo[PatchType.SERVER]!!
-                    setProperty("patches.server.module", serverPatchesInfo.moduleName)
-                    setProperty("patches.server.base", serverPatchesInfo.base)
-                    setProperty("patches.server.path", modulePaths[serverPatchesInfo.moduleName])
-                    val apiPatchesInfo = patchesInfo[PatchType.API]!!
-                    setProperty("patches.api.module", apiPatchesInfo.moduleName)
-                    setProperty("patches.api.base", apiPatchesInfo.base)
-                    setProperty("patches.api.path", modulePaths[apiPatchesInfo.moduleName])
-                    val generatedApiPatchesInfo = patchesInfo[PatchType.GENERATED_API]!!
-                    setProperty("patches.generated-api.module", generatedApiPatchesInfo.moduleName)
-                    setProperty("patches.generated-api.base", generatedApiPatchesInfo.base)
-                    setProperty("patches.generated-api.path", modulePaths[generatedApiPatchesInfo.moduleName])
-                }
-                configFile.outputStream().use { fileOutputStream ->
-                    properties.store(fileOutputStream, null)
-                }
-                project.guessProjectDir()?.refresh(true, false)
+            with(properties) {
+                val serverPatchesInfo = patchesInfo[PatchType.SERVER]!!
+                serverPatchesInfo.base = modulePaths[serverPatchesInfo.module]!!
+                setProperty("patches.server.module", serverPatchesInfo.module)
+                setProperty("patches.server.path", serverPatchesInfo.path)
+                setProperty("patches.server.base", serverPatchesInfo.base)
+                val apiPatchesInfo = patchesInfo[PatchType.API]!!
+                apiPatchesInfo.base = serverPatchesInfo.base
+                setProperty("patches.api.module", apiPatchesInfo.module)
+                setProperty("patches.api.path", apiPatchesInfo.path)
+                setProperty("patches.api.base", serverPatchesInfo.base)
+                val generatedApiPatchesInfo = patchesInfo[PatchType.GENERATED_API]!!
+                generatedApiPatchesInfo.base = modulePaths[generatedApiPatchesInfo.module]!!
+                setProperty("patches.generated-api.module", generatedApiPatchesInfo.module)
+                setProperty("patches.generated-api.path", generatedApiPatchesInfo.path)
+                setProperty("patches.generated-api.base", serverPatchesInfo.base)
             }
+            configFile.outputStream().use { fileOutputStream ->
+                properties.store(fileOutputStream, null)
+            }
+            project.guessProjectDir()?.refresh(true, false)
         }
     }
 

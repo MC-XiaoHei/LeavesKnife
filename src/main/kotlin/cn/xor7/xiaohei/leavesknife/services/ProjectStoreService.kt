@@ -61,7 +61,7 @@ class ProjectStoreService(private val project: Project) {
 val Project.leavesknifeStoreService: ProjectStoreService
     get() = this.getService(ProjectStoreService::class.java)
 
-data class PatchesInfo(var moduleName: String, var base: String)
+data class PatchesInfo(var module: String, var path: String, var base: String)
 
 enum class PatchType {
     SERVER, API, GENERATED_API
