@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="false">
     <id>cn.xor7.xiaohei.leavesknife</id>
     <name>LeavesKnife</name>
     <vendor>mc-xiaohei</vendor>

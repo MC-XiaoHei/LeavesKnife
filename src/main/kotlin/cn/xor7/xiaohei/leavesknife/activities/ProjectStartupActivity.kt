@@ -38,7 +38,6 @@ class ProjectStartupActivity : ProjectActivity {
                         properties.getProperty("patches.generated-api.base")!!
                     )
                     enablePlugin = true
-                    println(patchesInfo)
                 } catch (_: Exception) {
                     thisLogger().warn("Failed to read plugin config")
                 }

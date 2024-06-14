@@ -5,8 +5,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.ui.components.JBPanel
 import com.intellij.ui.content.ContentFactory
+import com.intellij.ui.dsl.builder.panel
 
 class PatchesToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
@@ -26,8 +26,10 @@ class PatchesToolWindowFactory : ToolWindowFactory {
     class ServerPatchesToolWindow(toolWindow: ToolWindow) {
         private val service = toolWindow.project.service<ProjectStoreService>()
 
-        fun getContent() = JBPanel<JBPanel<*>>().apply {
-
+        fun getContent() = panel {
+            row {
+                label("Hello, World!")
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.ToolWindowManager
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -41,8 +42,9 @@ class ProjectStoreService(private val project: Project) {
                     .getNotificationGroup("LeavesKnife")
                     .createNotification(
                         CommonBundle.message("notification.configure.title"),
-                        NotificationType.INFORMATION
+                        NotificationType.INFORMATION,
                     )
+                    .setIcon(IconLoader.getIcon("/icons/icon-16x.svg",this.javaClass.classLoader))
                     .addAction(object : NotificationAction(CommonBundle.message("notification.configure.action")) {
                         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
                             notification.hideBalloon()
