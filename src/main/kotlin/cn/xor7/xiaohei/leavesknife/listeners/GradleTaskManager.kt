@@ -14,7 +14,11 @@ class GradleTaskManager : GradleTaskManagerExtension {
         jvmParametersSetup: String?,
         listener: ExternalSystemTaskNotificationListener,
     ): Boolean {
-        println("taskname: $taskNames, projectPath: $projectPath, settings: $settings, jvmParametersSetup: $jvmParametersSetup, listener: $listener")
+        taskNames.forEach {
+            if(it.startsWith("apply") && it.endsWith("Patches")) {
+                // start listen
+            }
+        }
         return super.executeTasks(id, taskNames, projectPath, settings, jvmParametersSetup, listener)
     }
 
