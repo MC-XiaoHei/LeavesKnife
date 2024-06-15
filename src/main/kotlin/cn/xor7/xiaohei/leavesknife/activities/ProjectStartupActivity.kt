@@ -2,6 +2,7 @@ package cn.xor7.xiaohei.leavesknife.activities
 
 import cn.xor7.xiaohei.leavesknife.services.PatchType
 import cn.xor7.xiaohei.leavesknife.services.PatchesInfo
+import cn.xor7.xiaohei.leavesknife.services.PluginStatus
 import cn.xor7.xiaohei.leavesknife.services.leavesknifeStoreService
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -14,7 +15,6 @@ import org.gradle.tooling.model.idea.IdeaProject
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.inputStream
-
 
 class ProjectStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) = with(project.leavesknifeStoreService) {
@@ -37,15 +37,20 @@ class ProjectStartupActivity : ProjectActivity {
                         properties.getProperty("patches.generated-api.path")!!,
                         properties.getProperty("patches.generated-api.base")!!
                     )
-                    enablePlugin = true
+                    status = PluginStatus.TOOLWINDOW_ENABLED
                 } catch (_: Exception) {
+                    status = PluginStatus.BROKEN_CONFIG
                     thisLogger().warn("Failed to read plugin config")
                 }
             }
         }
         scanModules(project)
-        if (!modulePaths.containsKey("paper-api-generator") && !enablePlugin) return
-        if (!enablePlugin) needConfigure = true
+        status = if (modulePaths.containsKey("paper-api-generator")) {
+            if (status != PluginStatus.TOOLWINDOW_ENABLED) PluginStatus.MISSING_CONFIG
+            else PluginStatus.ENABLED
+        } else {
+            PluginStatus.DISABLED
+        }
     }
 
     private suspend fun scanModules(project: Project) {

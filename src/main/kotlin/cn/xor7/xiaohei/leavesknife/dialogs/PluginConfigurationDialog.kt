@@ -3,6 +3,7 @@ package cn.xor7.xiaohei.leavesknife.dialogs
 import cn.xor7.xiaohei.leavesknife.CommonBundle
 import cn.xor7.xiaohei.leavesknife.services.PatchType
 import cn.xor7.xiaohei.leavesknife.services.PatchesInfo
+import cn.xor7.xiaohei.leavesknife.services.PluginStatus
 import cn.xor7.xiaohei.leavesknife.services.leavesknifeStoreService
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
@@ -16,7 +17,6 @@ import org.jetbrains.annotations.Nullable
 import java.util.*
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComponent
-
 
 class PluginConfigurationDialog(private val project: Project) : DialogWrapper(true) {
     private val store = project.leavesknifeStoreService
@@ -99,8 +99,7 @@ class PluginConfigurationDialog(private val project: Project) : DialogWrapper(tr
     override fun doOKAction() {
         super.doOKAction()
         with(store) {
-            enablePlugin = true
-            needConfigure = false
+            status = PluginStatus.ENABLED
             val configFile = configPath.toFile()
             if (!configFile.exists()) configFile.createNewFile()
             with(properties) {
