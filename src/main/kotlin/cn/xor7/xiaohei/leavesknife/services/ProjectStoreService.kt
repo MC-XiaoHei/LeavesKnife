@@ -1,17 +1,9 @@
 package cn.xor7.xiaohei.leavesknife.services
 
-import cn.xor7.xiaohei.leavesknife.CommonBundle
-import cn.xor7.xiaohei.leavesknife.dialogs.PluginConfigurationDialog
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationAction
-import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationType
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
-import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.ToolWindowManager
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -21,43 +13,25 @@ const val LEAVESKNIFE_CONFIG_FILE = "leavesknife.properties"
 
 @Service(Service.Level.PROJECT)
 class ProjectStoreService(private val project: Project) {
-    var enablePlugin = false
+    var status = PluginStatus.DISABLED
         set(value) {
-            field = value
+            if(field == value) return
             runInEdt {
                 ToolWindowManager
                     .getInstance(project)
                     .getToolWindow("Patches")
-                    ?.isAvailable = value
+                    ?.isAvailable = value == PluginStatus.ENABLED || value == PluginStatus.TOOLWINDOW_ENABLED
             }
-        }
-    var needConfigure = false
-        set(value) {
-            if (value) enablePlugin = false
-            if (field == value) return
             field = value
-            if (value) {
-                @Suppress("DialogTitleCapitalization")
-                NotificationGroupManager.getInstance()
-                    .getNotificationGroup("LeavesKnife")
-                    .createNotification(
-                        CommonBundle.message("notification.configure.title"),
-                        NotificationType.INFORMATION,
-                    )
-                    .setIcon(IconLoader.getIcon("/icons/icon-16x.svg",this.javaClass.classLoader))
-                    .addAction(object : NotificationAction(CommonBundle.message("notification.configure.action")) {
-                        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-                            notification.hideBalloon()
-                            PluginConfigurationDialog(project).show()
-                        }
-                    })
-                    .notify(project)
-            }
         }
     var modulePaths: MutableMap<String, String> = mutableMapOf()
     val patchesInfo: MutableMap<PatchType, PatchesInfo> = mutableMapOf()
     val properties = Properties()
     val configPath: Path = Paths.get(project.guessProjectDir()?.path ?: ".", LEAVESKNIFE_CONFIG_FILE)
+}
+
+enum class PluginStatus {
+    DISABLED, MISSING_CONFIG, BROKEN_CONFIG, TOOLWINDOW_ENABLED, ENABLED
 }
 
 val Project.leavesknifeStoreService: ProjectStoreService

@@ -1,13 +1,10 @@
 package cn.xor7.xiaohei.leavesknife.toolWindow
 
 import cn.xor7.xiaohei.leavesknife.services.ProjectStoreService
-import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.openapi.wm.ToolWindowManager
-import com.intellij.ui.components.JBPanel
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.panel
 

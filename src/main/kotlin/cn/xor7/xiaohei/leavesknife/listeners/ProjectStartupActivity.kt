@@ -1,9 +1,14 @@
-package cn.xor7.xiaohei.leavesknife.activities
+package cn.xor7.xiaohei.leavesknife.listeners
 
+import cn.xor7.xiaohei.leavesknife.CommonBundle
+import cn.xor7.xiaohei.leavesknife.dialogs.PluginConfigurationDialog
 import cn.xor7.xiaohei.leavesknife.services.PatchType
 import cn.xor7.xiaohei.leavesknife.services.PatchesInfo
 import cn.xor7.xiaohei.leavesknife.services.PluginStatus
 import cn.xor7.xiaohei.leavesknife.services.leavesknifeStoreService
+import cn.xor7.xiaohei.leavesknife.utils.createPluginInfoNotification
+import cn.xor7.xiaohei.leavesknife.utils.createSimpleNotification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
@@ -46,9 +51,36 @@ class ProjectStartupActivity : ProjectActivity {
         }
         scanModules(project)
         status = if (modulePaths.containsKey("paper-api-generator")) {
-            if (status != PluginStatus.TOOLWINDOW_ENABLED) PluginStatus.MISSING_CONFIG
-            else PluginStatus.ENABLED
+            when (status) {
+                PluginStatus.TOOLWINDOW_ENABLED -> PluginStatus.ENABLED
+                PluginStatus.BROKEN_CONFIG -> {
+                    createSimpleNotification(
+                        CommonBundle.message("notification.broken_config.title"),
+                        NotificationType.ERROR,
+                        CommonBundle.message("notification.broken_config.action")
+                    ) {
+                        PluginConfigurationDialog(project).show()
+                    }.notify(project)
+                    PluginStatus.BROKEN_CONFIG
+                }
+
+                PluginStatus.DISABLED -> {
+                    createPluginInfoNotification(
+                        CommonBundle.message("notification.missing_config.title"),
+                        CommonBundle.message("notification.missing_config.action")
+                    ) {
+                        PluginConfigurationDialog(project).show()
+                    }.notify(project)
+                    PluginStatus.MISSING_CONFIG
+                }
+
+                else -> PluginStatus.DISABLED
+            }
         } else {
+            createSimpleNotification(
+                CommonBundle.message("notification.unexpected_config.title"),
+                NotificationType.WARNING
+            ).notify(project)
             PluginStatus.DISABLED
         }
     }

@@ -148,7 +148,6 @@ class PluginConfigurationDialog(private val project: Project) : DialogWrapper(tr
         }
     }
 
-
     private fun getFallbackOption(patchType: PatchType): String {
         return if (patchType == PatchType.GENERATED_API)
             store.modulePaths.keys.find { it.contains("generator", ignoreCase = true) }

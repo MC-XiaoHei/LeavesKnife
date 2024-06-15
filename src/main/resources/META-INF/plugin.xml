@@ -9,7 +9,7 @@
     <resource-bundle>messages.CommonBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <postStartupActivity implementation="cn.xor7.xiaohei.leavesknife.activities.ProjectStartupActivity"/>
+        <postStartupActivity implementation="cn.xor7.xiaohei.leavesknife.listeners.ProjectStartupActivity"/>
         <toolWindow factoryClass="cn.xor7.xiaohei.leavesknife.toolWindow.PatchesToolWindowFactory"
                     id="Patches"
                     anchor="right"
@@ -21,7 +21,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-        <taskManager implementation="cn.xor7.xiaohei.leavesknife.services.GradleTaskManager"/>
+        <taskManager implementation="cn.xor7.xiaohei.leavesknife.listeners.GradleTaskManager"/>
     </extensions>
 
     <applicationListeners>
