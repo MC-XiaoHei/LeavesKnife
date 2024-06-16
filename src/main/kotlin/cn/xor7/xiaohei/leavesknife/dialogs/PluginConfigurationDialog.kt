@@ -109,15 +109,15 @@ class PluginConfigurationDialog(private val project: Project) : DialogWrapper(tr
                 setProperty("patches.server.path", serverPatchesInfo.path)
                 setProperty("patches.server.base", serverPatchesInfo.base)
                 val apiPatchesInfo = patchesInfo[PatchType.API]!!
-                apiPatchesInfo.base = serverPatchesInfo.base
+                apiPatchesInfo.base = modulePaths[apiPatchesInfo.module]!!
                 setProperty("patches.api.module", apiPatchesInfo.module)
                 setProperty("patches.api.path", apiPatchesInfo.path)
-                setProperty("patches.api.base", serverPatchesInfo.base)
+                setProperty("patches.api.base", apiPatchesInfo.base)
                 val generatedApiPatchesInfo = patchesInfo[PatchType.GENERATED_API]!!
                 generatedApiPatchesInfo.base = modulePaths[generatedApiPatchesInfo.module]!!
                 setProperty("patches.generated-api.module", generatedApiPatchesInfo.module)
                 setProperty("patches.generated-api.path", generatedApiPatchesInfo.path)
-                setProperty("patches.generated-api.base", serverPatchesInfo.base)
+                setProperty("patches.generated-api.base", generatedApiPatchesInfo.base)
             }
             configFile.outputStream().use { fileOutputStream ->
                 properties.store(fileOutputStream, null)
