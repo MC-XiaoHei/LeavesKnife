@@ -10,6 +10,8 @@ import org.jetbrains.plugins.gradle.settings.GradleExecutionSettings
 import kotlin.concurrent.thread
 
 class GradleTaskManager : GradleTaskManagerExtension {
+    private val applyPatchesWatcherThreadSet = mutableSetOf<Thread>()
+
     override fun executeTasks(
         id: ExternalSystemTaskId,
         taskNames: MutableList<String>,
@@ -18,6 +20,7 @@ class GradleTaskManager : GradleTaskManagerExtension {
         jvmParametersSetup: String?,
         listener: ExternalSystemTaskNotificationListener,
     ): Boolean {
+        applyPatchesWatcherThreadSet.forEach { it.interrupt() }
         taskNames
             .filter { name -> name.startsWith("apply") && name.endsWith("Patches") }
             .forEach { name ->
@@ -37,11 +40,11 @@ class GradleTaskManager : GradleTaskManagerExtension {
                             else -> return@forEach
                         }.forEach { info ->
                             println("Creating watcher for ${info.base}")
-                            thread {
-                                createModuleApplyPatchesWatcher(projectPath,info.base) {
+                            applyPatchesWatcherThreadSet.add(thread {
+                                createModuleApplyPatchesWatcher(projectPath, info.base) {
                                     println(it)
                                 }
-                            }
+                            })
                         }
                     } catch (_: Exception) {
                         return@forEach

@@ -58,7 +58,7 @@ fun createModuleApplyPatchesWatcher(
     moduleBase: String,
     onEvent: (Int) -> Unit,
 ) {
-    if (File(moduleBase).exists()) createModuleDotGitPathWatcher(projectDir, onEvent)
+    if (File(moduleBase).exists()) createModuleDotGitPathWatcher(moduleBase, onEvent)
     else createWatchService(
         Path.of(projectDir),
         StandardWatchEventKinds.ENTRY_CREATE
@@ -73,9 +73,9 @@ private fun createModuleDotGitPathWatcher(
     moduleBase: String,
     onEvent: (Int) -> Unit,
 ) {
-    if (File("$moduleBase/.git").exists()) createGitRebaseWatchService("$moduleBase/.git") { onEvent(it) }
+    val dotGitPath = "$moduleBase/.git"
+    if (File(dotGitPath).exists()) createGitRebaseWatchService(dotGitPath) { onEvent(it) }
     else createWatchService(Path.of(moduleBase), StandardWatchEventKinds.ENTRY_CREATE) childEvent@{
-        val dotGitPath = "$moduleBase/.git"
         if (!File(dotGitPath).exists()) return@childEvent true
         createGitRebaseWatchService(dotGitPath) { onEvent(it) }
         return@childEvent false
