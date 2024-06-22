@@ -20,11 +20,11 @@ class GradleTaskManager : GradleTaskManagerExtension {
         jvmParametersSetup: String?,
         listener: ExternalSystemTaskNotificationListener,
     ): Boolean {
-        applyPatchesWatcherThreadSet.forEach { it.interrupt() }
         taskNames
             .filter { name -> name.startsWith("apply") && name.endsWith("Patches") }
             .forEach { name ->
                 val store = id.findProject()?.leavesknifeStoreService ?: return@forEach
+                applyPatchesWatcherThreadSet.forEach { it.interrupt() }
                 with(store) {
                     try {
                         when (name) {
