@@ -1,6 +1,7 @@
 package cn.xor7.xiaohei.leavesknife.utils
 
 import java.io.File
+import java.io.FileNotFoundException
 import java.nio.file.*
 
 fun createWatchService(
@@ -8,14 +9,19 @@ fun createWatchService(
     vararg events: WatchEvent.Kind<*>?,
     onEvent: (WatchEvent<*>) -> Boolean,
 ) {
-    val watchService: WatchService = FileSystems.getDefault().newWatchService()
-    path.register(watchService, events)
-    var key: WatchKey
-    while ((watchService.take().also { key = it }) != null && key.isValid) {
-        for (event: WatchEvent<*> in key.pollEvents()) {
-            if (!onEvent(event)) return
+    FileSystems.getDefault().newWatchService().use { watchService ->
+        path.register(watchService, events)
+        var key: WatchKey
+        try {
+            while ((watchService.take().also { key = it }) != null && key.isValid) {
+                for (event: WatchEvent<*> in key.pollEvents()) {
+                    if (!onEvent(event)) return
+                }
+                key.reset()
+            }
+        } catch (_: InterruptedException) {
+            println("WatchService Interrupted")
         }
-        key.reset()
     }
 }
 
@@ -41,12 +47,16 @@ fun createGitRebaseWatchService(
             ) childEvent@{
                 if (file == null) file = File("$rebaseApplyPath/next")
                 if (!file.exists()) return@childEvent false
-                val content = file.readLines().first().toInt()
-                if (content != next) {
-                    next = content
-                    onEvent(file.readLines().first().toInt())
+                try {
+                    val content = file.readLines().first().toInt()
+                    if (content != next) {
+                        next = content
+                        onEvent(content)
+                    }
+                    return@childEvent true
+                } catch (_: FileNotFoundException) {
+                    return@childEvent false
                 }
-                return@childEvent true
             }
             return@parentEvent false
         } else return@parentEvent true

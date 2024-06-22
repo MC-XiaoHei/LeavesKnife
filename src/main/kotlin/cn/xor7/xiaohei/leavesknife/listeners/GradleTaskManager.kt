@@ -25,6 +25,7 @@ class GradleTaskManager : GradleTaskManagerExtension {
             .forEach { name ->
                 val store = id.findProject()?.leavesknifeStoreService ?: return@forEach
                 applyPatchesWatcherThreadSet.forEach { it.interrupt() }
+                applyPatchesWatcherThreadSet.clear()
                 with(store) {
                     try {
                         when (name) {
