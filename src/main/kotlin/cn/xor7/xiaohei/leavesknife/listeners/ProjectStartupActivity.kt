@@ -83,11 +83,6 @@ class ProjectStartupActivity : ProjectActivity {
             ).notify(project)
             PluginStatus.DISABLED
         }
-        if(status == PluginStatus.ENABLED) onEnable()
-    }
-
-    private fun onEnable() {
-
     }
 
     private suspend fun scanModules(project: Project) {
