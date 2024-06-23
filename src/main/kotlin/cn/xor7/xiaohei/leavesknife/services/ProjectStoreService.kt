@@ -34,7 +34,11 @@ class ProjectStoreService(private val project: Project) {
     val patchesInfo: MutableMap<PatchType, PatchesInfo> = mutableMapOf()
     val properties = Properties()
     val configPath: Path = Paths.get(project.guessProjectDir()?.path ?: ".", LEAVESKNIFE_CONFIG_FILE)
-    val patchesList = mutableMapOf<PatchType,MutableList<String>>()
+    val patchesList = mutableMapOf<PatchType,MutableList<String>>(
+        PatchType.SERVER to mutableListOf(),
+        PatchType.API to mutableListOf(),
+        PatchType.GENERATED_API to mutableListOf()
+    )
 
     private fun onEnable() {
         println("Enabling plugin")
@@ -47,7 +51,6 @@ class ProjectStoreService(private val project: Project) {
                 status = PluginStatus.BROKEN_CONFIG
                 return
             }
-            patchesList[patchType] = mutableListOf()
             patchesDir.list()?.forEach {
                 patchesList[patchType]?.add(it)
             }
