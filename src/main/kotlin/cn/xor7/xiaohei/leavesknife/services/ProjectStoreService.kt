@@ -6,6 +6,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.wm.ToolWindowManager
+import com.jetbrains.rd.util.CopyOnWriteArrayList
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -28,20 +29,44 @@ class ProjectStoreService(private val project: Project) {
                     ?.isAvailable = value == PluginStatus.ENABLED || value == PluginStatus.TOOLWINDOW_ENABLED
             }
             if (value == PluginStatus.ENABLED) onEnable()
+            if (value == PluginStatus.TOOLWINDOW_ENABLED) onToolWindowEnable()
             field = value
         }
     var modulePaths: MutableMap<String, String> = mutableMapOf()
     val patchesInfo: MutableMap<PatchType, PatchesInfo> = mutableMapOf()
     val properties = Properties()
     val configPath: Path = Paths.get(project.guessProjectDir()?.path ?: ".", LEAVESKNIFE_CONFIG_FILE)
-    val patchesList = mutableMapOf<PatchType,MutableList<String>>(
-        PatchType.SERVER to mutableListOf(),
-        PatchType.API to mutableListOf(),
-        PatchType.GENERATED_API to mutableListOf()
+    val patchesList = mutableMapOf<PatchType, CopyOnWriteArrayList<String>>(
+        PatchType.SERVER to CopyOnWriteArrayList(),
+        PatchType.API to CopyOnWriteArrayList(),
+        PatchType.GENERATED_API to CopyOnWriteArrayList()
     )
 
     private fun onEnable() {
         println("Enabling plugin")
+        patchesInfo.forEach { patchInfoEntry ->
+            val path = patchInfoEntry.value.path
+            val patchType = patchInfoEntry.key
+            println("Creating watcher for $path")
+            thread {
+                createWatchService(
+                    Paths.get(path),
+                    StandardWatchEventKinds.ENTRY_MODIFY
+                ) {
+                    val newPatchesList = CopyOnWriteArrayList<String>()
+                    File(path).list()?.forEach {
+                        newPatchesList.add(it)
+                    }
+                    patchesList[patchType] = newPatchesList
+                    return@createWatchService true
+                }
+            }
+        }
+        println(patchesList)
+    }
+
+    private fun onToolWindowEnable() {
+        println("Enabling tool window")
         patchesInfo.forEach { patchInfoEntry ->
             val path = patchInfoEntry.value.path
             val patchType = patchInfoEntry.key
@@ -54,22 +79,7 @@ class ProjectStoreService(private val project: Project) {
             patchesDir.list()?.forEach {
                 patchesList[patchType]?.add(it)
             }
-            println("Creating watcher for $path")
-            thread {
-                createWatchService(
-                    Paths.get(path),
-                    StandardWatchEventKinds.ENTRY_MODIFY
-                ) {
-                    val newPatchesList = mutableListOf<String>()
-                    File(path).list()?.forEach {
-                        newPatchesList.add(it)
-                    }
-                    patchesList[patchType] = newPatchesList
-                    return@createWatchService true
-                }
-            }
         }
-        println(patchesList)
     }
 }
 
