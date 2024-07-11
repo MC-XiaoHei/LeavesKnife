@@ -3,6 +3,7 @@ package cn.xor7.xiaohei.leavesknife.toolWindow
 import cn.xor7.xiaohei.leavesknife.services.PatchType
 import cn.xor7.xiaohei.leavesknife.services.leavesknifeStoreService
 import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
@@ -15,7 +16,7 @@ import com.intellij.ui.treeStructure.Tree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
-class PatchesToolWindowFactory : ToolWindowFactory {
+class PatchesToolWindowFactory : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val serverPatchesToolWindow = ServerPatchesToolWindow(toolWindow)
         val content = ContentFactory.getInstance().createContent(
