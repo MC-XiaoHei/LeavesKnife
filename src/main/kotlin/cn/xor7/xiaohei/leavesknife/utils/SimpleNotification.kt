@@ -1,12 +1,11 @@
 package cn.xor7.xiaohei.leavesknife.utils
 
-import cn.xor7.xiaohei.leavesknife.CommonBundle
+import cn.xor7.xiaohei.leavesknife.Icons
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.util.IconLoader
 
 fun createSimpleNotification(
     title: String,
@@ -33,4 +32,4 @@ fun createPluginInfoNotification(
     actionName: String,
     action: (AnActionEvent) -> Unit,
 ): Notification = createSimpleNotification(title, NotificationType.INFORMATION, actionName, action)
-    .setIcon(IconLoader.getIcon("/icons/icon-16x.svg", CommonBundle.javaClass.classLoader))
+    .setIcon(Icons.pluginIcon)
